@@ -1,0 +1,193 @@
+/* 1. 기본 레이아웃 및 폰트 */
+body {
+    background-color: #121212; color: #e0e0e0;
+    font-family: 'Pretendard', sans-serif;
+    display: flex; justify-content: center; padding: 20px; margin: 0;
+}
+.container { width: 100%; max-width: 800px; }
+.card { background: #1e1e1e; padding: 20px; margin-bottom: 20px; border-radius: 12px; border: 1px solid #333; }
+
+/* 2. 제목 스타일 복구 */
+h1 { color: #76c8f3 !important; margin-bottom: 25px; text-align: center; }
+h2 { 
+    color: #ffffff !important; 
+    margin-top: 0; 
+    margin-bottom: 15px; 
+    font-size: 1.2rem; 
+    border-bottom: 1px solid #333; 
+    padding-bottom: 8px;
+}
+
+/* 3. 입력 필드 및 버튼 */
+input, select, textarea { 
+    width: 100%; padding: 10px; margin: 8px 0; 
+    background: #2c2c2c; border: 1px solid #444; 
+    color: white; border-radius: 6px; box-sizing: border-box; 
+}
+.radio-group { 
+    display: flex; gap: 20px; padding: 12px; 
+    background: #252525; border-radius: 6px; border: 1px solid #333; 
+    margin: 0px 0; justify-content: center; 
+}
+button { 
+    width: 100%; padding: 12px; background: #ffffff; 
+    color: #121212; border: none; font-weight: bold; 
+    border-radius: 6px; cursor: pointer; transition: 0.2s; 
+}
+button:hover {
+    background: #76c8f3;
+    transform: translateY(-1px);
+}
+button:active {
+    background: #76c8f3;
+    transform: translateY(0px);
+}
+
+/* 4. 매매 통계 가로 배치 레이아웃 */
+.stats-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 15px 0;
+    gap: 30px;
+}
+#chartContainer { 
+    position: relative; 
+    width: 200px; 
+    height: 200px; 
+}
+
+/* 우측 승률 박스 */
+.win-rate-box {
+    text-align: center;
+    background: #252525;
+    padding: 25px 35px;
+    border-radius: 15px;
+    border: 1px solid #444;
+}
+.win-rate-label { font-size: 0.9rem; color: #aaa; margin-bottom: 8px; }
+.win-rate-value { 
+    font-size: 2.2rem; 
+    font-weight: bold; 
+    color: #00ff88; 
+    text-shadow: 0 0 10px rgba(0,255,136,0.3); 
+}
+
+/* 5. 범례 스타일 */
+.custom-legend { display: flex; justify-content: center; gap: 15px; margin-top: 15px; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; color: #aaa; }
+.dot { width: 10px; height: 10px; border-radius: 50%; }
+.dot.win { background: #00ff88; }
+.dot.loss { background: #ff4444; }
+.dot.draw { background: #888888; }
+
+/* 6. 누적 매매 기록 (폴더 및 스크롤) */
+.year-content { max-height: 500px; overflow-y: auto; padding-right: 5px; }
+.year-content::-webkit-scrollbar { width: 6px; }
+.year-content::-webkit-scrollbar-thumb { background: #444; border-radius: 10px; }
+
+.year-section, .month-section { margin-bottom: 10px; border-radius: 8px; overflow: hidden; border: 1px solid #333; }
+.year-content, .month-content { display: none; padding: 10px; }
+.year-section.active > .year-content, .month-section.active > .month-content { display: block; }
+
+.group-header { display: flex; align-items: center; padding: 12px 15px; cursor: pointer; transition: 0.2s; }
+.group-header:hover { background: #333; }
+.year-header { background: #1a1a1a; color: white; font-weight: bold; }
+.month-header { background: #252525; color: #00ff88; border-top: 1px solid #333; }
+
+/* 화살표 기본 스타일 */
+.arrow { 
+    display: inline-block; 
+    width: 18px; 
+    margin-right: 8px; 
+    transition: transform 0.3s ease; 
+    color: #76c8f3;
+}
+
+/* 열렸을 때 화살표 회전 (active 클래스 기준) */
+.year-section.active > .group-header .arrow,
+.month-section.active > .group-header .arrow {
+    transform: rotate(90deg);
+}
+
+/* 7. 테이블 및 태그 */
+.table-wrapper { width: 100%; overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; min-width: 300px; }
+th, td { padding: 12px 8px; text-align: center; border-bottom: 1px solid #333; }
+th { color: #76c8f3; font-size: 0.85rem; }
+
+.result-tag { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
+.result-tag.win { background: rgba(0,255,136,0.1); color: #00ff88; }
+.result-tag.loss { background: rgba(255,68,68,0.1); color: #ff4444; }
+.result-tag.draw { background: rgba(136,136,136,0.1); color: #888888; }
+
+/* 8. 버튼 애니메이션 */
+.action-btns { display: flex; gap: 8px; justify-content: center; flex-wrap: nowrap;}
+.btn-edit, .btn-delete { 
+    background: none; border: none; color: #666; 
+    cursor: pointer; font-size: 1rem; transition: 0.2s; 
+    width: auto !important; padding: 0 !important; 
+}
+.btn-edit:hover { color: #4488ff; transform: scale(1.2); }
+.btn-delete:hover { color: #ff4444; transform: scale(1.2); }
+
+.year-master-check {
+    margin: 0;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0; /* 크기 고정 */
+}
+
+.year-header {
+    padding: 10px 15px;
+    background: #2a2a2a;
+    display: flex;
+    align-items: center;
+}
+
+.checkbox-cell {
+    position: relative;
+    padding: 0 !important;
+    width: 50px;
+    height: 40px;
+}
+
+.checkbox-wrapper {
+    display: block; /* flex 대신 block으로 확실하게 채움 */
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    line-height: 40px; /* 세로 중앙 정렬 */
+    text-align: center;
+}
+
+.log-checkbox {
+    pointer-events: auto; /* 체크박스는 자체 클릭 허용 */
+    vertical-align: middle;
+}
+
+/* 계산하기 버튼 기본 스타일 */
+.calculator-button {
+    width: 100%;
+    padding: 12px;
+    background: #ffffff; /* 민수님 테마의 기본 초록색 */
+    color: #000;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 30px; /* 요청하신 마지막 줄과의 간격 */
+    transition: background-color 0.2s, transform 0.1s; /* 부드러운 변화 효과 */
+}
+
+/* 마우스를 올렸을 때 (Hover) */
+.calculator-button:hover {
+    background: #76c8f3; /* 약간 더 어두운 초록색으로 변경 */
+    transform: translateY(-1px); /* 살짝 위로 뜨는 효과 (선택사항) */
+}
+
+/* 버튼을 클릭하고 있을 때 (Active) */
+.calculator-button:active {
+    background: #76c8f3;
+    transform: translateY(0); /* 다시 원래대로 */
+}

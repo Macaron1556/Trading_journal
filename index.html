@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>간편 매매일지</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>📉 Trading Journal</h1>
+
+        <section class="calculator card">
+            <h2>진입 수량 및 레버리지 계산기</h2>
+            <div class="input-group">
+                <input type="number" id="balance" placeholder="시드($)">
+                <input type="number" id="entryPrice" placeholder="진입가($)">
+                <input type="number" id="stopLoss" placeholder="손절가($)">
+                <input type="number" id="riskAmount" placeholder="리스크(%)">
+            </div>
+            <button class="calculator-button" onclick="calculateTrade()" style="margin: 20px 0 30px 0; width: 100%; padding: 12px; font-weight: bold; border: none; border-radius: 6px; cursor: pointer;">계산하기</button>
+            <div id="calcResult" class="result-box">
+                수량: <span id="resQty">0</span> / 레버리지: <span id="resLev">0</span>
+            </div>
+        </section>
+
+        <section class="log-form card">
+            <h2>금일 매매 기록</h2>
+            <div class="form-grid">
+                <input type="date" id="tradeDate">
+                <input type="text" id="symbol" placeholder="종목명 (예: BTC)">
+                
+                <select id="position">
+                    <option value="LONG">LONG (롱)</option>
+                    <option value="SHORT">SHORT (숏)</option>
+                </select>
+        
+                <div class="radio-group">
+                    <label><input type="radio" name="result" value="WIN"> Win</label>
+                    <label><input type="radio" name="result" value="DRAW"> Draw</label>
+                    <label><input type="radio" name="result" value="LOSS"> Lose</label>
+                </div>
+        
+                <input type="number" id="profit" placeholder="수익금($)">
+                <input type="text" id="imageUrl" placeholder="매매 복기">
+                <textarea id="psychology" placeholder="매매 근거"></textarea>
+                <textarea id="memo" placeholder="비고"></textarea>
+                <button onclick="saveLog()">일지 저장</button>
+            </div>
+        </section>
+
+        <section class="log-list card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2 style="border: none; margin: 0;">누적 매매 기록</h2>
+                <button onclick="deleteSelected()" style="width: auto; padding: 5px 15px; background: #ff4444; color: white;">선택 항목 삭제</button>
+            </div>
+            <div id="logTableBody">
+                </div>
+        </section>
+
+        <section class="stats card">
+            <h2>매매 통계</h2>
+            <div class="stats-container">
+                <div id="chartContainer">
+                    <canvas id="winLossChart"></canvas>
+                </div>
+                
+                <div class="win-rate-box">
+                    <div class="win-rate-label">현재 승률</div>
+                    <div id="winRateValue" class="win-rate-value">0%</div>
+                </div>
+            </div>
+            
+            <div class="custom-legend">
+                <div class="legend-item"><span class="dot win"></span> Win</div>
+                <div class="legend-item"><span class="dot loss"></span> Lose</div>
+                <div class="legend-item"><span class="dot draw"></span> Draw</div>
+            </div>
+        </section>
+
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
