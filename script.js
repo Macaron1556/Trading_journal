@@ -55,11 +55,17 @@ function setupInputListeners() {
 // 2. 데이터 로드
 async function loadLogs() {
     try {
-        const response = await fetch('/api/journal');
-        const data = await response.json();
+        // 1. 서버대신 로컬 스토리지에서 데이터를 읽어옵니다.
+        const data = JSON.parse(localStorage.getItem('tradingLogs')) || [];
+        
+        // 2. 읽어온 데이터를 전역 변수(currentLogs)에 담아줍니다.
         currentLogs = data;
+        
+        // 3. 기존에 사용하던 화면 출력 및 차트 업데이트 함수 실행
         displayLogs(data); 
         updateChart(data); 
+        
+        console.log("로컬 데이터 로드 완료:", data);
     } catch (error) {
         console.error("데이터 로드 실패:", error);
     }
@@ -137,13 +143,15 @@ function updateChart(logs) {
 }
 
 // 4. 저장 기능 (수정 완료 후 즉시 리스트 갱신)
-async function saveLog() {
+async function saveLog(event) {
+    if(event) event.preventDefault();
     const resultValue = document.querySelector('input[name="result"]:checked')?.value;
     if (!document.getElementById('tradeDate').value || !resultValue) {
         return alert("날짜와 결과를 선택해주세요!");
     }
 
     const logData = {
+        id: editId || Date.now(), // 수정 중이면 기존 ID, 새 글이면 현재 시간으로 고유 ID 생성
         tradeDate: document.getElementById('tradeDate').value,
         symbol: document.getElementById('symbol').value,
         position: document.getElementById('position').value,
@@ -155,22 +163,38 @@ async function saveLog() {
     };
 
     try {
-        const response = await fetch('/api/journal', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(logData)
-        });
+        // --- [로컬 스토리지 저장 로직 시작] ---
+        // 1. 기존 데이터 가져오기 (없으면 빈 배열)
+        let logs = JSON.parse(localStorage.getItem('tradingLogs')) || [];
 
-        if (response.ok) {
-            if (editId !== null) {
-                await fetch(`/api/journal/${editId}`, { method: 'DELETE' });
-                editId = null;
+        if (editId !== null) {
+            // 2. 수정 모드일 때: 기존 데이터 찾아서 교체
+            const index = logs.findIndex(log => log.id === editId);
+            if (index !== -1) {
+                logs[index] = logData;
             }
-            alert("저장 성공!");
-            await loadLogs(); // 리스트 및 차트 즉시 로드
-            clearForm();
+            editId = null; // 수정 완료 후 초기화
+        } else {
+            // 3. 새 글 작성일 때: 배열에 추가
+            logs.push(logData);
         }
-    } catch (e) { alert("저장 실패"); }
+
+        // 4. 로컬 스토리지에 최종 배열 저장
+        localStorage.setItem('tradingLogs', JSON.stringify(logs));
+        // --- [로컬 스토리지 저장 로직 끝] ---
+
+        alert("브라우저에 저장 성공!");
+        
+        // 5. 화면 갱신
+        if (typeof loadLogs === 'function') {
+            await loadLogs(); 
+        }
+        clearForm();
+
+    } catch (e) { 
+        console.error(e);
+        alert("저장 실패"); 
+    }
 }
 
 // 5. 리스트 출력 및 기타 기능
@@ -297,9 +321,24 @@ async function deleteSelected() {
     if (!confirm(`선택한 ${checkedBoxes.length}개를 삭제하시겠습니까?`)) return;
 
     try {
-        await Promise.all(Array.from(checkedBoxes).map(cb => fetch(`/api/journal/${cb.value}`, { method: 'DELETE' })));
+        // 선택된 모든 ID값들을 배열로 가져오기
+        const selectedIds = Array.from(checkedBoxes).map(cb => Number(cb.value));
+        
+        // 로컬 스토리지 데이터 가져오기
+        let logs = JSON.parse(localStorage.getItem('tradingLogs')) || [];
+        
+        // 선택된 ID들에 포함되지 않은 로그들만 남기기
+        logs = logs.filter(log => !selectedIds.includes(log.id));
+        
+        // 다시 로컬 스토리지에 저장
+        localStorage.setItem('tradingLogs', JSON.stringify(logs));
+        
+        // 화면 갱신
         await loadLogs();
-    } catch (e) { alert("삭제 실패"); }
+    } catch (e) { 
+        console.error(e);
+        alert("삭제 실패"); 
+    }
 }
 
 function clearForm() {
@@ -338,8 +377,17 @@ function openDetail(log) {
 
 async function deleteLog(id) {
     if (confirm("삭제할까요?")) {
-        const res = await fetch(`/api/journal/${id}`, { method: 'DELETE' });
-        if (res.ok) await loadLogs();
+        // 로컬 스토리지에서 전체 데이터 가져오기
+        let logs = JSON.parse(localStorage.getItem('tradingLogs')) || [];
+        
+        // 해당 id를 제외한 나머지 데이터만 필터링 (삭제 효과)
+        logs = logs.filter(log => log.id !== id);
+        
+        // 다시 로컬 스토리지에 저장
+        localStorage.setItem('tradingLogs', JSON.stringify(logs));
+        
+        // 화면 갱신
+        await loadLogs();
     }
 }
 
