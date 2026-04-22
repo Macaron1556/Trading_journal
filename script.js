@@ -193,7 +193,7 @@ async function saveLog(event) {
 
     } catch (e) { 
         console.error(e);
-        alert("저장 실패"); 
+        alert("저장 실패" + e.message); 
     }
 }
 
@@ -350,8 +350,13 @@ function clearForm() {
     document.getElementById('memo').value = "";
     document.getElementById('imageUrl').value = "";
 
-    const saveBtn = document.querySelector('button[onclick="saveLog()"]');
-    saveBtn.innerText = "일지 저장"; saveBtn.style.backgroundColor = "";
+    const saveBtn = document.getElementById('saveBtn'); 
+    if (saveBtn) {
+        saveBtn.innerText = "일지 저장"; 
+        saveBtn.style.backgroundColor = "";
+    }
+    
+    editId = null;
 }
 
 function openDetail(log) {
