@@ -420,35 +420,36 @@ function handleDetailClick(id) {
 }
 
 function calculateTrade() {
-    // [확인] HTML의 id가 riskAmount이므로 그대로 사용합니다.
     const seedUSD = parseFloat(document.getElementById('balance').value) || 0;
     const riskPercent = parseFloat(document.getElementById('riskAmount').value) || 0; 
     const entryPriceUSD = parseFloat(document.getElementById('entryPrice').value) || 0;
     const stopLossUSD = parseFloat(document.getElementById('stopLoss').value) || 0;
 
-    // 환율 변수가 없을 경우를 대비해 1350원(기본값) 설정
     const exchangeRate = typeof currentExchangeRate !== 'undefined' ? currentExchangeRate : 1350;
 
     const priceDiffUSD = Math.abs(entryPriceUSD - stopLossUSD);
 
     if (seedUSD > 0 && riskPercent > 0 && priceDiffUSD > 0) {
         const targetRiskUSD = seedUSD * (riskPercent / 100);
-        let quantity = targetRiskUSD / priceDiffUSD;
+        
+        // [수정] Math.round를 사용하여 소수점 셋째 자리에서 반올림합니다.
+        // 0.0484 -> 0.048 (버림 효과)
+        // 0.0486 -> 0.049 (올림 효과)
+        let quantity = Math.round((targetRiskUSD / priceDiffUSD) * 1000) / 1000;
 
         if (quantity < 0.001) {
             quantity = 0.001;
-        } else {
-            quantity = Math.floor(quantity * 1000) / 1000;
         }
 
-        const usableSeed = seedUSD * 0.25; 
-        let requiredLev = (quantity * entryPriceUSD) / usableSeed;
+        // [수정] 레버리지는 시드 전체(100%)를 증거금으로 사용할 때를 기준으로 계산합니다.
+        // 그래야 365달러 기준 0.049개 진입 시 10.46x가 나옵니다.
+        let requiredLev = (quantity * entryPriceUSD) / seedUSD;
 
         document.getElementById('resQty').innerText = quantity;
         document.getElementById('resLev').innerText = requiredLev.toFixed(2) + "x";
 
-        // 검증 로그 (환율 에러 방지 처리됨)
-        console.log(`[검증] 손절 시 약 ${Math.round(targetRiskUSD * exchangeRate)}원 손실`);
+        console.log(`[검증] 수량: ${quantity}, 필요 레버리지: ${requiredLev.toFixed(2)}x`);
+        console.log(`[검증] 예상 손실: $${(quantity * priceDiffUSD).toFixed(2)} (${Math.round(quantity * priceDiffUSD * exchangeRate)}원)`);
     } else {
         document.getElementById('resQty').innerText = "0";
         document.getElementById('resLev').innerText = "0";
