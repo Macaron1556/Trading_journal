@@ -397,14 +397,34 @@ async function deleteLog(id) {
 }
 
 function editLog(log) {
+    // 1. 수정할 데이터의 ID 저장
     editId = log.id;
+
+    // 2. 기본 정보 복구
     document.getElementById('tradeDate').value = log.tradeDate;
     document.getElementById('symbol').value = log.symbol;
     document.getElementById('profit').value = log.profit;
+
+    // 3. 승/패/무 라디오 버튼 복구
     const radio = document.querySelector(`input[name="result"][value="${log.result}"]`);
     if (radio) radio.checked = true;
-    const saveBtn = document.querySelector('button[onclick="saveLog()"]');
-    saveBtn.innerText = "수정 완료"; saveBtn.style.backgroundColor = "#4488ff";
+
+    // 🔴 4. [추가된 부분] 상세 정보(복기, 근거, 비고) 복구
+    // 이 세 줄이 빠져 있어서 상세 내용이 안 나왔던 겁니다!
+    document.getElementById('imageUrl').value = log.imageUrl || ""; 
+    document.getElementById('psychology').value = log.psychology || ""; 
+    document.getElementById('memo').value = log.memo || ""; 
+
+    // 5. 버튼 상태 변경
+    // id="saveBtn"을 쓰거나, 현재 버튼의 텍스트를 바꿉니다.
+    const saveBtn = document.getElementById('saveBtn') || document.querySelector('button[onclick*="saveLog"]');
+    if (saveBtn) {
+        saveBtn.innerText = "수정 완료";
+        saveBtn.style.backgroundColor = "#4488ff";
+    }
+
+    // 6. 화면을 위로 올려서 수정 중임을 인지하게 함
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // 상세 버튼 클릭 시 호출될 징검다리 함수
