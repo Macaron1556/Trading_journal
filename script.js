@@ -424,7 +424,10 @@ function editLog(log) {
     }
 
     // 6. 화면을 위로 올려서 수정 중임을 인지하게 함
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const inputSection = document.getElementById('input-section'); 
+    if (inputSection) {
+        inputSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 }
 
 // 상세 버튼 클릭 시 호출될 징검다리 함수
