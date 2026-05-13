@@ -7,7 +7,7 @@ window.onload = function() {
     document.getElementById('tradeDate').value = today;
 
     loadLogs();
-    setupInputListeners(); // ★ 자동 부호 보정 활성화
+    setupInputListeners();
 };
 // 월별 체크박스 토글
 window.toggleGroup = function(master, groupId) {
@@ -25,7 +25,7 @@ window.toggleYearGroup = function(master, yearId) {
     });
 };
 
-// 1. [복구] 결과 선택에 따른 수익금 부호(+) / (-) 자동 변환 로직
+// 결과 선택에 따른 수익금 부호(+) / (-) 자동 변환 로직
 function setupInputListeners() {
     const resultRadios = document.querySelectorAll('input[name="result"]');
     const profitInput = document.getElementById('profit');
@@ -34,7 +34,6 @@ function setupInputListeners() {
         radio.addEventListener('change', function() {
             let val = parseFloat(profitInput.value);
             if (!isNaN(val)) {
-                // 패(LOSS) 선택 시 양수면 마이너스로, 승(WIN) 선택 시 음수면 플러스로
                 if (this.value === 'LOSS' && val > 0) profitInput.value = -val;
                 else if (this.value === 'WIN' && val < 0) profitInput.value = Math.abs(val);
             }
@@ -52,16 +51,13 @@ function setupInputListeners() {
     });
 }
 
-// 2. 데이터 로드
+// 데이터 로드
 async function loadLogs() {
     try {
-        // 1. 서버대신 로컬 스토리지에서 데이터를 읽어옵니다.
         const data = JSON.parse(localStorage.getItem('tradingLogs')) || [];
         
-        // 2. 읽어온 데이터를 전역 변수(currentLogs)에 담아줍니다.
         currentLogs = data;
         
-        // 3. 기존에 사용하던 화면 출력 및 차트 업데이트 함수 실행
         displayLogs(data); 
         updateChart(data); 
         
@@ -71,7 +67,7 @@ async function loadLogs() {
     }
 }
 
-// 3. [복구] 도넛 차트 & 우측 승률 (12시 기준: 좌측 초록 / 우측 빨강)
+// 도넛 차트 & 우측 승률
 function updateChart(logs) {
     const ctx = document.getElementById('winLossChart');
     if (!ctx) return;
@@ -102,9 +98,6 @@ function updateChart(logs) {
 
     if (winLossChart) winLossChart.destroy();
 
-    // 12시 방향에서 시작하여 시계 방향으로 [패, 무, 승] 배치
-    // -> 12시 기준 오른쪽은 패(빨강), 왼쪽은 승(초록)이 됨
-
     const hasData = stats.totalCount > 0;
 
     winLossChart = new Chart(ctx, {
@@ -121,7 +114,7 @@ function updateChart(logs) {
             responsive: true,
             maintainAspectRatio: false,
             cutout: '75%',
-            rotation: 0, // 시작 지점을 12시로 고정
+            rotation: 0,
             plugins: { legend: { display: false },
                        tooltip: { enabled: hasData }
             }
@@ -142,7 +135,7 @@ function updateChart(logs) {
     });
 }
 
-// 4. 저장 기능 (수정 완료 후 즉시 리스트 갱신)
+// 저장
 async function saveLog(event) {
     if(event) event.preventDefault();
     const resultValue = document.querySelector('input[name="result"]:checked')?.value;
@@ -151,7 +144,7 @@ async function saveLog(event) {
     }
 
     const logData = {
-        id: editId || Date.now(), // 수정 중이면 기존 ID, 새 글이면 현재 시간으로 고유 ID 생성
+        id: editId || Date.now(),
         tradeDate: document.getElementById('tradeDate').value,
         symbol: document.getElementById('symbol').value,
         position: document.getElementById('position').value,
@@ -163,29 +156,23 @@ async function saveLog(event) {
     };
 
     try {
-        // --- [로컬 스토리지 저장 로직 시작] ---
-        // 1. 기존 데이터 가져오기 (없으면 빈 배열)
         let logs = JSON.parse(localStorage.getItem('tradingLogs')) || [];
 
         if (editId !== null) {
-            // 2. 수정 모드일 때: 기존 데이터 찾아서 교체
             const index = logs.findIndex(log => log.id === editId);
             if (index !== -1) {
                 logs[index] = logData;
             }
-            editId = null; // 수정 완료 후 초기화
+            editId = null;
         } else {
-            // 3. 새 글 작성일 때: 배열에 추가
             logs.push(logData);
         }
 
-        // 4. 로컬 스토리지에 최종 배열 저장
         localStorage.setItem('tradingLogs', JSON.stringify(logs));
-        // --- [로컬 스토리지 저장 로직 끝] ---
 
         alert("브라우저에 저장 성공!");
         
-        // 5. 화면 갱신
+        // 화면 갱신
         if (typeof loadLogs === 'function') {
             await loadLogs(); 
         }
@@ -197,7 +184,7 @@ async function saveLog(event) {
     }
 }
 
-// 5. 리스트 출력 및 기타 기능
+// 리스트 출력 및 기타 기능
 function displayLogs(logs) {
     const logContainer = document.getElementById('logTableBody');
     if (!logContainer) return;
@@ -218,11 +205,9 @@ function displayLogs(logs) {
     sortedYears.forEach((year, yIdx) => {
         const yearSection = document.createElement('div');
         const yearId = `year_${yIdx}`;
-        // 마지막 연도는 기본적으로 열려있게(active)
         const isLastYear = yIdx === sortedYears.length - 1;
         yearSection.className = `year-section ${isLastYear ? 'active' : ''}`;
         
-        // [2번 수정] 화살표 및 클릭 이벤트 복구
         yearSection.innerHTML = `
             <div class="group-header year-header" onclick="this.closest('.year-section').classList.toggle('active')">
                 <input type ="checkbox"
@@ -243,7 +228,6 @@ function displayLogs(logs) {
             monthSection.className = `month-section ${isLastMonth ? 'active' : ''}`;
             const groupId = `group_${yIdx}_${mIdx}`;
             
-            // [3번 수정] 테이블 내 체크박스 복구
             monthSection.innerHTML = `
                 <div class="group-header month-header" onclick="this.closest('.month-section').classList.toggle('active')">
                     <span class="arrow">▶</span> 📁 ${month} (${nestedData[year][month].length}건)
@@ -296,9 +280,8 @@ function displayLogs(logs) {
     });
 }
 
-// [복구] 체크박스 전체 선택 기능
+// 체크박스 전체 선택 기능
 function toggleGroup(master, groupId) {
-    // 해당 그룹 아이디를 클래스로 가진 모든 체크박스 선택
     const checkboxes = document.querySelectorAll('.' + groupId);
     checkboxes.forEach(cb => {
         cb.checked = master.checked;
@@ -307,33 +290,27 @@ function toggleGroup(master, groupId) {
 
 // 연도별 전체 선택
 function toggleYearGroup(master, yearId) {
-    // 해당 연도 아이디를 클래스로 가진 모든 하위 체크박스 선택
     const children = document.querySelectorAll(`.${yearId}_child`);
     children.forEach(cb => {
         cb.checked = master.checked;
     });
 }
 
-// [복구] 선택 항목 삭제 기능
+// 선택 항목 삭제 기능
 async function deleteSelected() {
     const checkedBoxes = document.querySelectorAll('.log-checkbox:checked');
     if (checkedBoxes.length === 0) return alert("삭제할 항목을 선택해주세요.");
     if (!confirm(`선택한 ${checkedBoxes.length}개를 삭제하시겠습니까?`)) return;
 
     try {
-        // 선택된 모든 ID값들을 배열로 가져오기
         const selectedIds = Array.from(checkedBoxes).map(cb => Number(cb.value));
         
-        // 로컬 스토리지 데이터 가져오기
         let logs = JSON.parse(localStorage.getItem('tradingLogs')) || [];
         
-        // 선택된 ID들에 포함되지 않은 로그들만 남기기
         logs = logs.filter(log => !selectedIds.includes(log.id));
         
-        // 다시 로컬 스토리지에 저장
         localStorage.setItem('tradingLogs', JSON.stringify(logs));
         
-        // 화면 갱신
         await loadLogs();
     } catch (e) { 
         console.error(e);
@@ -359,6 +336,7 @@ function clearForm() {
     editId = null;
 }
 
+// 상세 버튼 로직
 function openDetail(log) {
     const detailWindow = window.open('', '_blank');
     detailWindow.document.write(`
@@ -380,50 +358,40 @@ function openDetail(log) {
     `);
 }
 
+// 삭제
 async function deleteLog(id) {
     if (confirm("삭제할까요?")) {
-        // 로컬 스토리지에서 전체 데이터 가져오기
         let logs = JSON.parse(localStorage.getItem('tradingLogs')) || [];
         
-        // 해당 id를 제외한 나머지 데이터만 필터링 (삭제 효과)
         logs = logs.filter(log => log.id !== id);
         
-        // 다시 로컬 스토리지에 저장
         localStorage.setItem('tradingLogs', JSON.stringify(logs));
         
-        // 화면 갱신
         await loadLogs();
     }
 }
 
+// 수정
 function editLog(log) {
-    // 1. 수정할 데이터의 ID 저장
     editId = log.id;
 
-    // 2. 기본 정보 복구
     document.getElementById('tradeDate').value = log.tradeDate;
     document.getElementById('symbol').value = log.symbol;
     document.getElementById('profit').value = log.profit;
 
-    // 3. 승/패/무 라디오 버튼 복구
     const radio = document.querySelector(`input[name="result"][value="${log.result}"]`);
     if (radio) radio.checked = true;
 
-    // 🔴 4. [추가된 부분] 상세 정보(복기, 근거, 비고) 복구
-    // 이 세 줄이 빠져 있어서 상세 내용이 안 나왔던 겁니다!
     document.getElementById('imageUrl').value = log.imageUrl || ""; 
     document.getElementById('psychology').value = log.psychology || ""; 
     document.getElementById('memo').value = log.memo || ""; 
 
-    // 5. 버튼 상태 변경
-    // id="saveBtn"을 쓰거나, 현재 버튼의 텍스트를 바꿉니다.
     const saveBtn = document.getElementById('saveBtn') || document.querySelector('button[onclick*="saveLog"]');
     if (saveBtn) {
         saveBtn.innerText = "수정 완료";
         saveBtn.style.backgroundColor = "#4488ff";
     }
 
-    // 6. 화면을 위로 올려서 수정 중임을 인지하게 함
     const inputSection = document.getElementById('input-section'); 
     if (inputSection) {
         inputSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -432,11 +400,9 @@ function editLog(log) {
 
 // 상세 버튼 클릭 시 호출될 징검다리 함수
 function handleDetailClick(id) {
-    // 민수님 코드에 선언된 배열 이름(currentlogs)을 확인하세요. 
-    // 대소문자 주의: currentlogs인지 currentLogs인지 확인 후 맞추면 됩니다.
     const targetLog = currentLogs.find(l => l.id === id);
     if (targetLog) {
-        openDetail(targetLog); // 기존에 있던 함수 호출
+        openDetail(targetLog);
     } else {
         console.error("해당 로그를 찾을 수 없습니다.");
     }
@@ -455,17 +421,12 @@ function calculateTrade() {
     if (seedUSD > 0 && riskPercent > 0 && priceDiffUSD > 0) {
         const targetRiskUSD = seedUSD * (riskPercent / 100);
         
-        // [수정] Math.round를 사용하여 소수점 셋째 자리에서 반올림합니다.
-        // 0.0484 -> 0.048 (버림 효과)
-        // 0.0486 -> 0.049 (올림 효과)
         let quantity = Math.round((targetRiskUSD / priceDiffUSD) * 1000) / 1000;
 
         if (quantity < 0.001) {
             quantity = 0.001;
         }
 
-        // [수정] 레버리지는 시드 전체(100%)를 증거금으로 사용할 때를 기준으로 계산합니다.
-        // 그래야 365달러 기준 0.049개 진입 시 10.46x가 나옵니다.
         let requiredLev = (quantity * entryPriceUSD) / seedUSD;
 
         document.getElementById('resQty').innerText = quantity;

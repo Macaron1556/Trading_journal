@@ -1,4 +1,4 @@
-/* 1. 기본 레이아웃 및 폰트 */
+/* 기본 레이아웃 및 폰트 */
 body {
     background-color: #121212; color: #e0e0e0;
     font-family: 'Pretendard', sans-serif;
@@ -7,7 +7,7 @@ body {
 .container { width: 100%; max-width: 800px; }
 .card { background: #1e1e1e; padding: 20px; margin-bottom: 20px; border-radius: 12px; border: 1px solid #333; }
 
-/* 2. 제목 스타일 복구 */
+/* 제목 스타일 복구 */
 h1 { color: #76c8f3 !important; margin-bottom: 25px; text-align: center; }
 h2 { 
     color: #ffffff !important; 
@@ -18,7 +18,7 @@ h2 {
     padding-bottom: 8px;
 }
 
-/* 3. 입력 필드 및 버튼 */
+/* 입력 필드 및 버튼 */
 input, select, textarea { 
     width: 100%; padding: 10px; margin: 8px 0; 
     background: #2c2c2c; border: 1px solid #444; 
@@ -43,7 +43,7 @@ button:active {
     transform: translateY(0px);
 }
 
-/* 4. 매매 통계 가로 배치 레이아웃 */
+/* 매매 통계 가로 배치 레이아웃 */
 .stats-container {
     display: flex;
     align-items: center;
@@ -73,7 +73,7 @@ button:active {
     text-shadow: 0 0 10px rgba(0,255,136,0.3); 
 }
 
-/* 5. 범례 스타일 */
+/* 범례 스타일 */
 .custom-legend { display: flex; justify-content: center; gap: 15px; margin-top: 15px; }
 .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; color: #aaa; }
 .dot { width: 10px; height: 10px; border-radius: 50%; }
@@ -81,7 +81,7 @@ button:active {
 .dot.loss { background: #ff4444; }
 .dot.draw { background: #888888; }
 
-/* 6. 누적 매매 기록 (폴더 및 스크롤) */
+/* 누적 매매 기록 (폴더 및 스크롤) */
 .year-content { max-height: 500px; overflow-y: auto; padding-right: 5px; }
 .year-content::-webkit-scrollbar { width: 6px; }
 .year-content::-webkit-scrollbar-thumb { background: #444; border-radius: 10px; }
@@ -110,7 +110,7 @@ button:active {
     transform: rotate(90deg);
 }
 
-/* 7. 테이블 및 태그 */
+/* 테이블 및 태그 */
 .table-wrapper { width: 100%; overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; min-width: 300px; }
 th, td { padding: 12px 8px; text-align: center; border-bottom: 1px solid #333; }
@@ -121,7 +121,7 @@ th { color: #76c8f3; font-size: 0.85rem; }
 .result-tag.loss { background: rgba(255,68,68,0.1); color: #ff4444; }
 .result-tag.draw { background: rgba(136,136,136,0.1); color: #888888; }
 
-/* 8. 버튼 애니메이션 */
+/* 버튼 애니메이션 */
 .action-btns { display: flex; gap: 8px; justify-content: center; flex-wrap: nowrap;}
 .btn-edit, .btn-delete { 
     background: none; border: none; color: #666; 
@@ -135,7 +135,7 @@ th { color: #76c8f3; font-size: 0.85rem; }
     margin: 0;
     width: 18px;
     height: 18px;
-    flex-shrink: 0; /* 크기 고정 */
+    flex-shrink: 0;
 }
 
 .year-header {
@@ -153,16 +153,16 @@ th { color: #76c8f3; font-size: 0.85rem; }
 }
 
 .checkbox-wrapper {
-    display: block; /* flex 대신 block으로 확실하게 채움 */
+    display: block;
     width: 100%;
     height: 100%;
     cursor: pointer;
-    line-height: 40px; /* 세로 중앙 정렬 */
+    line-height: 40px;
     text-align: center;
 }
 
 .log-checkbox {
-    pointer-events: auto; /* 체크박스는 자체 클릭 허용 */
+    pointer-events: auto;
     vertical-align: middle;
 }
 
@@ -170,24 +170,24 @@ th { color: #76c8f3; font-size: 0.85rem; }
 .calculator-button {
     width: 100%;
     padding: 12px;
-    background: #ffffff; /* 민수님 테마의 기본 초록색 */
+    background: #ffffff;
     color: #000;
     border: none;
     border-radius: 6px;
     font-weight: bold;
     cursor: pointer;
-    margin-bottom: 30px; /* 요청하신 마지막 줄과의 간격 */
-    transition: background-color 0.2s, transform 0.1s; /* 부드러운 변화 효과 */
+    margin-bottom: 30px;
+    transition: background-color 0.2s, transform 0.1s;
 }
 
 /* 마우스를 올렸을 때 (Hover) */
 .calculator-button:hover {
-    background: #76c8f3; /* 약간 더 어두운 초록색으로 변경 */
-    transform: translateY(-1px); /* 살짝 위로 뜨는 효과 (선택사항) */
+    background: #76c8f3;
+    transform: translateY(-1px);
 }
 
 /* 버튼을 클릭하고 있을 때 (Active) */
 .calculator-button:active {
     background: #76c8f3;
-    transform: translateY(0); /* 다시 원래대로 */
+    transform: translateY(0);
 }
